@@ -6,6 +6,7 @@ set -o pipefail
 
 readonly APP_NAME="${0##*/}"
 readonly APP_VERSION="0.0.1"
+readonly APP_AUTHOR="sheepla (https://github.com/sheepla)"
 
 readonly EXITCODE_OK="0"
 readonly EXITCODE_ERR_ARGS="1"
@@ -17,13 +18,48 @@ readonly COLOR_FG_CYAN='\033[36;1m'
 readonly COLOR_FG_BLACK='\033[30;1m'
 readonly COLOR_NORMAL='\033[m'
 
+function Usage() {
+    echo -e "\
+${APP_NAME} -- show pacman summary
+
+${COLOR_FG_WHITE}USAGE${COLOR_NORMAL}
+  ${APP_NAME}
+  ${APP_NAME} [-h|--help]
+  ${APP_NAME} [-V|--version]
+
+${COLOR_FG_WHITE}OPTIONS${COLOR_NORMAL}
+  -h, --help    show help message then exit
+  -V, --version show version then exit
+
+${COLOR_FG_WHITE}AUTHOR${COLOR_NORMAL}
+  ${APP_AUTHOR}
+">&2
+}
+
 function Main() {
   if ! Has "pacman"; then
     Err "pacman command not found."
     return "${EXITCODE_ERR_COMMAND}"
   fi
 
-  paste <(ShowLogo) <(
+  for arg in "${@}"; do
+    case "${arg}" in
+    -h | --help)
+      Usage
+      return "${EXITCODE_OK}"
+      ;;
+    -v | -V | --version)
+      echo -e "${APP_NAME} -- v${APP_VERSION}"
+      return "${EXITCODE_OK}"
+      ;;
+    *)
+      Err "Invalid argument ${arg}"
+      return "${EXITCODE_ERR_ARGS}"
+      ;;
+    esac
+  done
+
+  paste -d "" <(ShowLogo) <(
     ShowInfo
     ShowColorBar
   )
@@ -32,7 +68,7 @@ function Main() {
 }
 
 function ShowLogo() {
-  printf "\
+  echo -e "\
                                           
                  ${COLOR_FG_BLACK}^~!!~^${COLOR_NORMAL}                   
              ${COLOR_FG_BLACK}^!!!!!!!!!!~${COLOR_NORMAL}                 
@@ -62,7 +98,7 @@ function Has() {
 }
 
 function Err() {
-  printf "[ \033[31;1mERR\033[m ] %s\n" "${1}"
+  printf "[ ${COLOR_FG_RED}ERR${COLOR_NORMAL} ] %s\n" "${1}"
 }
 
 function Pacman() {
@@ -82,7 +118,7 @@ function CountPkgsExplictNative() {
 }
 
 function CountPkgsUpgradable() {
-    Pacman -Quq | wc -l
+  Pacman -Quq | wc -l
 }
 
 function ShowLargestPkgs() {
@@ -95,12 +131,12 @@ function ShowLargestPkgs() {
 }
 
 function ShowUpgradablePkgs() {
-    Pacman -Qu | head -n 5 | sed 's/^/    /g'
+  Pacman -Qu | head -n 5 | sed 's/^/    /g'
 }
 
 function ShowInfo() {
   printf "\n${COLOR_FG_CYAN}%s${COLOR_NORMAL}@${COLOR_FG_CYAN}%s${COLOR_NORMAL}\n" "$(whoami)" "$(hostname)"
-  printf "${COLOR_FG_BLACK}-----------------------------------------${COLOR_NORMAL}\n"
+  printf "${COLOR_FG_BLACK}%s${COLOR_NORMAL}\n" "---------------------------------------------------"
   printf "${COLOR_FG_CYAN}all installed packages: ${COLOR_NORMAL}${COLOR_FG_WHITE}%s${COLOR_NORMAL}\n" "$(CountPkgs)"
   printf "${COLOR_FG_CYAN}explictly installed packages: ${COLOR_NORMAL}${COLOR_FG_WHITE}%s${COLOR_NORMAL}\n" "$(CountPkgsExplict)"
   printf "${COLOR_FG_CYAN}explictly installed packages (native): ${COLOR_NORMAL}${COLOR_FG_WHITE}%s${COLOR_NORMAL}\n" "$(CountPkgsExplictNative)"
@@ -111,10 +147,10 @@ function ShowInfo() {
 
 function ShowColorBar() {
   printf "\n"
-    for color in {0..7}; do
-      printf " \033[4${color};1m    \033[m"
-    done
-    printf "\n"
+  for color in {0..7}; do
+    printf " \033[4${color};1m%s\033[m" "    "
+  done
+  printf "\n"
 }
 
 Main "${@}"
