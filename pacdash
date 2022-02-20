@@ -4,7 +4,7 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-readonly APP_NAME="${0//*/}"
+readonly APP_NAME="${0##*/}"
 readonly APP_VERSION="0.0.1"
 
 readonly EXITCODE_OK="0"
@@ -12,6 +12,7 @@ readonly EXITCODE_ERR_ARGS="1"
 readonly EXITCODE_ERR_COMMAND="2"
 
 readonly COLOR_FG_RED='\033[31;1m'
+readonly COLOR_FG_WHITE='\033[1m'
 readonly COLOR_FG_CYAN='\033[36;1m'
 readonly COLOR_FG_BLACK='\033[30;1m'
 readonly COLOR_NORMAL='\033[m'
@@ -22,13 +23,16 @@ function Main() {
     return "${EXITCODE_ERR_COMMAND}"
   fi
 
-  paste <(ShowLogo) <(ShowInfo)
+  paste <(ShowLogo) <(
+    ShowInfo
+    ShowColorBar
+  )
 
   return "${EXITCODE_OK}"
 }
 
 function ShowLogo() {
-  echo -e "\
+  printf "\
                                           
                  ${COLOR_FG_BLACK}^~!!~^${COLOR_NORMAL}                   
              ${COLOR_FG_BLACK}^!!!!!!!!!!~${COLOR_NORMAL}                 
@@ -77,16 +81,40 @@ function CountPkgsExplictNative() {
   Pacman -Qeqn | wc -l
 }
 
-function UpgradablePkgs() {
-  Pacman -Quq | column
+function CountPkgsUpgradable() {
+    Pacman -Quq | wc -l
+}
+
+function ShowLargestPkgs() {
+  Pacman -Qeq | Pacman -Qi - |
+    awk '/^Name/{name=$3} /^Installed Size/{print $4$5, name}' |
+    sort --human-numeric-sort --reverse |
+    head -n 5 |
+    column -t |
+    sed 's/^/    /g'
+}
+
+function ShowUpgradablePkgs() {
+    Pacman -Qu | head -n 5 | sed 's/^/    /g'
 }
 
 function ShowInfo() {
-  printf "\n\n${COLOR_FG_CYAN}%s${COLOR_NORMAL}@${COLOR_FG_CYAN}%s${COLOR_NORMAL}\n" "$(whoami)" "$(hostname)"
+  printf "\n${COLOR_FG_CYAN}%s${COLOR_NORMAL}@${COLOR_FG_CYAN}%s${COLOR_NORMAL}\n" "$(whoami)" "$(hostname)"
   printf "${COLOR_FG_BLACK}-----------------------------------------${COLOR_NORMAL}\n"
-  printf "${COLOR_FG_CYAN}all installed packages: ${COLOR_NORMAL} %s\n" "$(CountPkgs)"
-  printf "${COLOR_FG_CYAN}explictly installed packages: ${COLOR_NORMAL} %s\n" "$(CountPkgsExplict)"
-  printf "${COLOR_FG_CYAN}explictly installed packages (native): ${COLOR_NORMAL} %s\n" "$(CountPkgsExplictNative)"
+  printf "${COLOR_FG_CYAN}all installed packages: ${COLOR_NORMAL}${COLOR_FG_WHITE}%s${COLOR_NORMAL}\n" "$(CountPkgs)"
+  printf "${COLOR_FG_CYAN}explictly installed packages: ${COLOR_NORMAL}${COLOR_FG_WHITE}%s${COLOR_NORMAL}\n" "$(CountPkgsExplict)"
+  printf "${COLOR_FG_CYAN}explictly installed packages (native): ${COLOR_NORMAL}${COLOR_FG_WHITE}%s${COLOR_NORMAL}\n" "$(CountPkgsExplictNative)"
+  printf "${COLOR_FG_CYAN}largest packages:${COLOR_FG_BLACK}\n%s\n" "$(ShowLargestPkgs)"
+  printf "\n"
+  printf "${COLOR_FG_WHITE}%s ${COLOR_FG_CYAN}updates available:${COLOR_FG_BLACK}\n%s\n%s\n" "$(CountPkgsUpgradable)" "$(ShowUpgradablePkgs)"
+}
+
+function ShowColorBar() {
+  printf "\n"
+    for color in {0..7}; do
+      printf " \033[4${color};1m    \033[m"
+    done
+    printf "\n"
 }
 
 Main "${@}"
