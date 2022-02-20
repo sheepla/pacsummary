@@ -1,8 +1,20 @@
+<div align="center">
+
 # pacdash
 
+</div>
+
+<div align="center">
+  
 show pacman summary with ascii art like [dylanaraps/neofetch](https://github.com/dylanaraps/neofetch).
 
-## USAGE
+</div>
+
+<div align="center">
+  <img src="https://user-images.githubusercontent.com/62412884/154840231-05956aef-3e9c-4f4f-ae7a-58c8903e8dc3.png" width="70%" />
+</div>
+
+## Usage
 
 ```
 pacdash -- show pacman summary
