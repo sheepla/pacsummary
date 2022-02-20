@@ -1,0 +1,93 @@
+#!/bin/bash
+
+set -o errexit
+set -o nounset
+set -o pipefail
+
+readonly APP_NAME="${0//*/}"
+readonly APP_VERSION="0.0.1"
+
+readonly EXITCODE_OK="0"
+readonly EXITCODE_ERR_ARGS="1"
+readonly EXITCODE_ERR_COMMAND="2"
+
+readonly COLOR_FG_RED='\033[31;1m'
+readonly COLOR_FG_CYAN='\033[36;1m'
+readonly COLOR_FG_BLACK='\033[30;1m'
+readonly COLOR_NORMAL='\033[m'
+
+function Main() {
+  if ! Has "pacman"; then
+    Err "pacman command not found."
+    return "${EXITCODE_ERR_COMMAND}"
+  fi
+
+  paste <(ShowLogo) <(ShowInfo)
+
+  return "${EXITCODE_OK}"
+}
+
+function ShowLogo() {
+  echo -e "\
+                                          
+                 ${COLOR_FG_BLACK}^~!!~^${COLOR_NORMAL}                   
+             ${COLOR_FG_BLACK}^!!!!!!!!!!~${COLOR_NORMAL}                 
+          ${COLOR_FG_BLACK}^~!!!!!!!!${COLOR_FG_CYAN}A${COLOR_FG_BLACK}!!!!!!!!^^${COLOR_NORMAL}           
+      ${COLOR_FG_BLACK}^~!!!!!!!!!!!${COLOR_FG_CYAN}?J7${COLOR_FG_BLACK}!!!!!!!!!!~^${COLOR_NORMAL}        
+  ${COLOR_FG_BLACK}^~!!!!!!!!!!!!!!${COLOR_FG_CYAN}7##J${COLOR_FG_BLACK}!!!!!!!!!!!!!!~^${COLOR_NORMAL}    
+  ${COLOR_FG_BLACK}~!!!!!!!!!!!!!!!${COLOR_FG_CYAN}7B&&#J${COLOR_FG_BLACK}!!!!!!!!!!!!!!!!${COLOR_NORMAL}  
+  ${COLOR_FG_BLACK}~!!!!!!!!!!!!!!${COLOR_FG_CYAN}75#&&&#J~${COLOR_FG_BLACK}!!!!!!!!!!!!!!${COLOR_NORMAL}  
+  ${COLOR_FG_BLACK}~!!!!!!!!!!!!!${COLOR_FG_CYAN}?G#B#&&&#Y${COLOR_FG_BLACK}!!!!!!!!!!!!!!${COLOR_NORMAL}  
+  ${COLOR_FG_BLACK}~!!!!!!!!!!!~${COLOR_FG_CYAN}?B&&&&&&&&#5${COLOR_FG_BLACK}!!!!!!!!!!!!!${COLOR_NORMAL}  
+  ${COLOR_FG_BLACK}~!!!!!!!!!!~${COLOR_FG_CYAN}J#&&&&BB#&&&#P${COLOR_FG_BLACK}!!!!!!!!!!!!${COLOR_NORMAL}  
+  ${COLOR_FG_BLACK}~!!!!!!!!!!${COLOR_FG_CYAN}5#&&&#?${COLOR_FG_BLACK}!!${COLOR_FG_CYAN}7G&&&&G${COLOR_FG_BLACK}!!!!!!!!!!!${COLOR_NORMAL}  
+  ${COLOR_FG_BLACK}~!!!!!!!!!${COLOR_FG_CYAN}P#&&&&P${COLOR_FG_BLACK}!!!~${COLOR_FG_CYAN}Y#&&#BP${COLOR_FG_BLACK}!!!!!!!!!!${COLOR_NORMAL}  
+  ${COLOR_FG_BLACK}~!!!!!!!${COLOR_FG_CYAN}7G&&#BFGJ${COLOR_FG_BLACK}!!!!${COLOR_FG_CYAN}?PBB#&#G7${COLOR_FG_BLACK}!!!!!!!!${COLOR_NORMAL}  
+  ${COLOR_FG_BLACK}~!!!!!!${COLOR_FG_CYAN}7GBPY?${COLOR_FG_BLACK}!!!!!!!!!!!!${COLOR_FG_CYAN}7J5BBJ${COLOR_FG_BLACK}!!!!!!!${COLOR_NORMAL}  
+  ${COLOR_FG_BLACK}^!!!!!!${COLOR_FG_CYAN}?7${COLOR_FG_BLACK}!!!!!!!!!!!!!!!!!!!!${COLOR_FG_CYAN}7?7${COLOR_FG_BLACK}!!!!!~${COLOR_NORMAL}  
+    ${COLOR_FG_BLACK}^~!!!!!!!!!!!!!!!!!!!!!!!!!!!!~^${COLOR_NORMAL}      
+        ${COLOR_FG_BLACK}^~!!!!!!!!!!!!!!!!!!!!~^${COLOR_NORMAL}          
+            ${COLOR_FG_BLACK}^~!!!!!!!!!!!!~~${COLOR_NORMAL}              
+               ${COLOR_FG_BLACK}^^~!!!!!~^${COLOR_NORMAL}                 
+                   ${COLOR_FG_BLACK}^^${COLOR_NORMAL}                     
+"
+}
+
+function Has() {
+  command -v "${1}" &>/dev/null
+}
+
+function Err() {
+  printf "[ \033[31;1mERR\033[m ] %s\n" "${1}"
+}
+
+function Pacman() {
+  LANG=C pacman "${@}"
+}
+
+function CountPkgs() {
+  Pacman -Qq | wc -l
+}
+
+function CountPkgsExplict() {
+  Pacman -Qeq | wc -l
+}
+
+function CountPkgsExplictNative() {
+  Pacman -Qeqn | wc -l
+}
+
+function UpgradablePkgs() {
+  Pacman -Quq | column
+}
+
+function ShowInfo() {
+  printf "\n\n${COLOR_FG_CYAN}%s${COLOR_NORMAL}@${COLOR_FG_CYAN}%s${COLOR_NORMAL}\n" "$(whoami)" "$(hostname)"
+  printf "${COLOR_FG_BLACK}-----------------------------------------${COLOR_NORMAL}\n"
+  printf "${COLOR_FG_CYAN}all installed packages: ${COLOR_NORMAL} %s\n" "$(CountPkgs)"
+  printf "${COLOR_FG_CYAN}explictly installed packages: ${COLOR_NORMAL} %s\n" "$(CountPkgsExplict)"
+  printf "${COLOR_FG_CYAN}explictly installed packages (native): ${COLOR_NORMAL} %s\n" "$(CountPkgsExplictNative)"
+}
+
+Main "${@}"
+exit "${?}"
