@@ -19,7 +19,7 @@ readonly COLOR_FG_BLACK='\033[30;1m'
 readonly COLOR_NORMAL='\033[m'
 
 function Usage() {
-    echo -e "\
+  echo -e "\
 ${APP_NAME} -- show pacman summary
 
 ${COLOR_FG_WHITE}USAGE${COLOR_NORMAL}
@@ -33,7 +33,7 @@ ${COLOR_FG_WHITE}OPTIONS${COLOR_NORMAL}
 
 ${COLOR_FG_WHITE}AUTHOR${COLOR_NORMAL}
   ${APP_AUTHOR}
-">&2
+" >&2
 }
 
 function Main() {
@@ -121,7 +121,7 @@ function CountPkgsUpgradable() {
   Pacman -Quq | wc -l
 }
 
-function ShowLargestPkgs() {
+function ShowLargePkgs() {
   Pacman -Qeq | Pacman -Qi - |
     awk '/^Name/{name=$3} /^Installed Size/{print $4$5, name}' |
     sort --human-numeric-sort --reverse |
@@ -140,7 +140,7 @@ function ShowInfo() {
   printf "${COLOR_FG_CYAN}all installed packages: ${COLOR_NORMAL}${COLOR_FG_WHITE}%s${COLOR_NORMAL}\n" "$(CountPkgs)"
   printf "${COLOR_FG_CYAN}explictly installed packages: ${COLOR_NORMAL}${COLOR_FG_WHITE}%s${COLOR_NORMAL}\n" "$(CountPkgsExplict)"
   printf "${COLOR_FG_CYAN}explictly installed packages (native): ${COLOR_NORMAL}${COLOR_FG_WHITE}%s${COLOR_NORMAL}\n" "$(CountPkgsExplictNative)"
-  printf "${COLOR_FG_CYAN}largest packages:${COLOR_FG_BLACK}\n%s\n" "$(ShowLargestPkgs)"
+  printf "${COLOR_FG_CYAN}large packages:${COLOR_FG_BLACK}\n%s\n" "$(ShowLargePkgs)"
   printf "\n"
   printf "${COLOR_FG_WHITE}%s ${COLOR_FG_CYAN}updates available:${COLOR_FG_BLACK}\n%s\n%s\n" "$(CountPkgsUpgradable)" "$(ShowUpgradablePkgs)"
 }
