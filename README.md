@@ -2,6 +2,24 @@
 
 show pacman summary with ascii art like [dylanaraps/neofetch](https://github.com/dylanaraps/neofetch).
 
+## USAGE
+
+```
+pacdash -- show pacman summary
+
+USAGE
+  pacdash
+  pacdash [-h|--help]
+  pacdash [-V|--version]
+
+OPTIONS
+  -h, --help    show help message then exit
+  -V, --version show version then exit
+
+AUTHOR
+  sheepla (https://github.com/sheepla)
+```
+
 ## Installation
 
 ## Try pacdash
