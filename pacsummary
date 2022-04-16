@@ -135,7 +135,7 @@ function ShowUpgradablePkgs() {
 }
 
 function ShowInfo() {
-  printf "\n${COLOR_FG_CYAN}%s${COLOR_NORMAL}@${COLOR_FG_CYAN}%s${COLOR_NORMAL}\n" "$(whoami)" "$(hostname)"
+  printf "\n${COLOR_FG_CYAN}%s${COLOR_NORMAL}@${COLOR_FG_CYAN}%s${COLOR_NORMAL}\n" "$(whoami)" "$(Hostname)"
   printf "${COLOR_FG_BLACK}%s${COLOR_NORMAL}\n" "---------------------------------------------------"
   printf "${COLOR_FG_CYAN}all installed packages: ${COLOR_NORMAL}${COLOR_FG_WHITE}%s${COLOR_NORMAL}\n" "$(CountPkgs)"
   printf "${COLOR_FG_CYAN}explictly installed packages: ${COLOR_NORMAL}${COLOR_FG_WHITE}%s${COLOR_NORMAL}\n" "$(CountPkgsExplict)"
@@ -151,6 +151,16 @@ function ShowColorBar() {
     printf " \033[4${color};1m%s\033[m" "    "
   done
   printf "\n"
+}
+
+function Hostname() {
+  if Has hostname; then
+    hostname
+  elif [ -f /etc/hostname ]; then
+    cat /etc/hostname
+  else
+    echo -n "unknown"
+  fi
 }
 
 Main "${@}"
