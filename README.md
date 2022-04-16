@@ -1,6 +1,6 @@
 <div align="center">
 
-# pacdash
+# pacsummary
 
 </div>
 
@@ -17,12 +17,12 @@ show pacman summary with ascii art like [dylanaraps/neofetch](https://github.com
 ## Usage
 
 ```
-pacdash -- show pacman summary
+pacsummary -- show pacman summary
 
 USAGE
-  pacdash
-  pacdash [-h|--help]
-  pacdash [-V|--version]
+  pacsummary
+  pacsummary [-h|--help]
+  pacsummary [-V|--version]
 
 OPTIONS
   -h, --help    show help message then exit
@@ -34,11 +34,11 @@ AUTHOR
 
 ## Installation
 
-## Try pacdash
+## Try pacsummary
 
 ```bash
-curl -sLO https://raw.githubusercontent.com/sheepla/pacdash/main/pacdash
-chmod +x ./pacdash
+curl -sLO https://raw.githubusercontent.com/sheepla/pacsummary/main/pacsummary
+chmod +x ./pacsummary
 ```
 
 ## Install
