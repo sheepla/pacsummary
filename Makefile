@@ -1,4 +1,4 @@
-NAME := pacdash
+NAME := pacsummary
 
 PREFIX ?= /usr/local
 BINDIR := $(PREFIX)/bin
